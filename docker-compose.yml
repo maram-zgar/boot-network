@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  database:
+    image: mysql:8.0
+    container_name: mysql-bsn
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - dbnetwork
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: [ "redis-server", "--save", "60", "1000", "--loglevel", "warning" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    container_name: mysql-adminer-bsn
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    networks:
+      - dbnetwork
+
+  mail-dev:
+    container_name: mail-dev-bsn
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+#    networks:
+#      - microservices-net
+
+volumes:
+  mysqldata:
+  redis-data:
+
+networks:
+  dbnetwork:
+    driver: bridge

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration xmlns="http://ch.qos.logback/xml/ns/logback-spring"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://ch.qos.logback/xml/ns/logback-spring
+               https://raw.githubusercontent.com/borgille/logback-spring-XSD/master/src/main/xsd/logback-spring.xsd">
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d %-5level %logger - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Async appender that sends logs to LOKI_DIRECT in a background thread -->
+    <appender name="ASYNC_LOKI" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>16384</queueSize>       <!-- Max number of log events stored in the async queue before processing -->
+        <discardingThreshold>0</discardingThreshold> <!-- don't discard unless full -->
+        <neverBlock>true</neverBlock><!-- If true, never block the main thread when queue is full; instead drop logs -->
+        <maxFlushTime>10000</maxFlushTime>
+        <appender-ref ref="LOKI_DIRECT"/> <!-- The actual appender that will receive the logs after async processing -->
+    </appender>
+
+    <!-- Direct appender that sends logs to Grafana Loki over HTTP -->
+    <appender name="LOKI_DIRECT" class="com.github.loki4j.logback.Loki4jAppender">
+        <!-- HTTP configuration for sending logs -->
+        <http>
+            <!-- Loki push endpoint URL -->
+            <url>https://logs-prod-021.grafana.net/loki/api/v1/push</url>
+            <!-- Authentication credentials (injected from environment variables) -->
+            <auth>
+                <username>${LOKI_USER}</username>
+                <password>${LOKI_TOKEN}</password>
+            </auth>
+        </http>
+        <!-- Log message formatting for Loki -->
+        <format>
+            <!-- Labels (Loki metadata) for log querying -->
+            <label>
+                <pattern>
+                    app=${spring.application.name:-boot-network},
+                    env=${spring.profiles.active:-prod}
+                </pattern>
+                <!-- Structured metadata labels (attached to each log entry) -->
+                <structeredMetaDataPattern>
+                    level = %level,                      <!-- Log level (INFO, ERROR, etc.) -->
+                    thread = %thread,                    <!-- Thread name -->
+                    class = %logger,                     <!-- Logger name/class -->
+                    userId = %mdc{userId:-none}          <!-- User ID from MDC (or "none" if missing) -->
+                </structeredMetaDataPattern>
+            </label>
+            <!-- Keep labels static to avoid creating too many label variations in Loki -->
+            <staticLabels>true</staticLabels>
+            <message class="com.github.loki4j.logback.JsonLayout" /> <!-- The logs are sent in Json format -->
+        </format>
+    </appender>
+    
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>Logs/application.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/application.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <timeZone>CET</timeZone>
+            <customFields>
+                {
+                    "service": "${spring.application.name:-spring-boot-crash-course}",
+                    "env": "${spring.profiles.active:-prod}"
+                }
+            </customFields>
+        </encoder>
+
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_LOKI"/>
+        <appender-ref ref="JSON_FILE"/>
+    </root>
+</configuration>

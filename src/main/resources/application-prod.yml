@@ -1,0 +1,52 @@
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        web: ERROR
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3308/${DATABASE}  # ensure DATABASE env variable is set
+    username: ${DB_USER}                          # ensure DB_USER env variable is set
+    password: ${DB_PASSWORD}                      # ensure DB_PASSWORD env variable is set
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always                   # optional: ensures DB initialization
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+  mail:
+    host: localhost
+    port: 1025
+    username: ${MAIL_USER:maram}                  # default to "maram" if MAIL_USER not set
+    password: ${MAIL_PASSWORD:passwd}            # default to "passwd" if MAIL_PASSWORD not set
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+application:
+  security:
+    jwt:
+      secret-key: 55647a4f7c02d28dd27d54c250bee89714ec2e0e93e02b7e40b605a813d824d2
+      expiration: 3600000
+  mailing:
+    frontend:
+      activation-url: http://localhost:4200/activate-account
+
+server:
+  port: 8088

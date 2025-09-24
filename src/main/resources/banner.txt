@@ -1,0 +1,12 @@
+ ___      ___       __        _______        __       ___      ___
+|"  \    /"  |     /""\      /"      \      /""\     |"  \    /"  |
+ \   \  //   |    /    \    |:        |    /    \     \   \  //   |
+ /\\  \/.    |   /' /\  \   |_____/   )   /' /\  \    /\\  \/.    |
+|: \.        |  //  __'  \   //      /   //  __'  \  |: \.        |
+|.  \    /:  | /   /  \\  \ |:  __   \  /   /  \\  \ |.  \    /:  |
+|___|\__/|___|(___/    \___)|__|  \___)(___/    \___)|___|\__/|___|
+
+     :: Application :: User Login & Registration with Email validation
+     ::  Developer  :: Maram Zgar
+     ::    Java     :: ${java.version}
+     :: Spring Boot :: ${spring-boot.version}

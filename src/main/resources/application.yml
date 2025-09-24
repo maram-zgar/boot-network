@@ -1,0 +1,43 @@
+spring:
+#  main:
+#    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 50MB
+  application:
+    name: boot-network-app
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+#      username: maram
+#      password: mypassword
+
+springdoc:
+  default-produces-media-type: application/json
+
+server:
+  servlet:
+    context-path: /api/v1
+  port: 8088
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+resilience4j:
+  ratelimiter:
+    instances:
+      getCoursesRateLimiter:
+        limitForPeriod: 2
+        limitRefreshPeriod: 5s
+        timeoutDuration: 0s #2s if you want to the request to be delayed for 2 seconds so it waits to be resent
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0 #Every single request that enters your Spring Boot application will be traced and sent to Zipkin

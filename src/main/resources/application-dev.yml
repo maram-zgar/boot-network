@@ -1,0 +1,48 @@
+logging:
+  level:
+    root: INFO
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3308/${DATABASE}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+  mail:
+    host: localhost
+    port: 1025
+    username: maram
+    password: passwd
+    properties:
+      mail:
+        smtp:
+          trust: "*" # trust all SSL certificates from the SMTP server
+        auth: true # the client will authenticate using the username and password before sending mail
+        starttls:
+          enable: true # Enables STARTTLS encryption — this means the connection starts unencrypted but then upgrades to a secure (TLS) connection
+        connectiontimeout: 5000 #maximum time to establish connection to SMTP server
+        timeout: 3000 #timeout for reading data from the server
+        writetimeout: 5000 #timeout for sending data to the server
+
+application:
+  security:
+    jwt:
+      secret-key: 55647a4f7c02d28dd27d54c250bee89714ec2e0e93e02b7e40b605a813d824d2
+      expiration: 3600000
+  mailing:
+    frontend:
+      activation-url: http://localhost:4200/activate-account
+
+server:
+  port: 8088
