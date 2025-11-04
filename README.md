@@ -1,0 +1,1 @@
+Réalisation d’un projet Spring Boot intégrant une authentification sécurisée (identifiants, code unique par e-mail, vérification par jeton), avec gestion des utilisateurs et sécurité des données renforcée.
